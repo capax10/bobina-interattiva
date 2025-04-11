@@ -90,12 +90,19 @@ def animate_rotation(D, L):
     R = D / 2
     theta = L / R
     angle_colla_init_rad = np.radians(90)
+    fig_base, *_ = draw_roll(D, L, highlight_point=None)  # disegno base senza colla animata
     for i in range(steps + 1):
         step_theta = theta * i / steps
         angle_step = angle_colla_init_rad + step_theta
         x_step = R * np.cos(angle_step)
         y_step = R * np.sin(angle_step)
-        fig, _, _, _, _ = draw_roll(D, L, highlight_point=(x_step, y_step))
+        fig, ax = plt.subplots(figsize=(7, 7))
+        ax.imshow(fig_base.canvas.buffer_rgba(), extent=ax.get_window_extent().bounds, aspect='auto')
+        ax.plot([0, x_step], [0, y_step], color='red', linestyle='--', linewidth=2)
+        ax.plot(x_step, y_step, 'o', color='red', markersize=6)
+        ax.set_xlim(-R - 200, R + 200)
+        ax.set_ylim(-R - 200, R + 200)
+        ax.axis('off')
         st.pyplot(fig, use_container_width=True)
         time.sleep(0.05)
 
