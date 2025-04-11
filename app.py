@@ -22,8 +22,8 @@ def draw_roll(D, L, highlight_point=None):
     angle_colla_final_deg = np.degrees(angle_colla_final_rad) % 360
     x_colla_init = R * np.cos(angle_colla_init_rad)
     y_colla_init = R * np.sin(angle_colla_init_rad)
-    x_colla_final = R * np.cos(np.radians(90 + theta_deg))
-    y_colla_final = R * np.sin(np.radians(90 + theta_deg))
+    x_colla_final = R * np.cos(angle_colla_final_rad)
+    y_colla_final = R * np.sin(angle_colla_final_rad)
 
     theta_deg = (angle_nip_deg - angle_colla_final_deg) % 360
 
@@ -78,7 +78,7 @@ def draw_roll(D, L, highlight_point=None):
     ax.set_xlim(-R - 200, R + 200)
     ax.set_ylim(rullo_offset_y - 60, R + 120)
     ax.set_aspect('equal')
-    ax.set_title(f"✨ Bobina Interattiva ✨\\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm", fontsize=13, fontweight='bold', color="#333")
+    ax.set_title(f"✨ Bobina Interattiva ✨ Diametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm", fontsize=13, fontweight='bold', color="#333")
 
     ax.legend(loc='upper right', fontsize=8, frameon=True)
 
