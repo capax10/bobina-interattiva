@@ -94,4 +94,6 @@ D = st.slider("Diametro della bobina (mm)", min_value=800, max_value=1200, value
 L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=1200, step=10)
 
 
+fig, theta_deg, angle_colla_init_rad, theta, R = draw_roll(D, L)
+st.pyplot(fig, use_container_width=True)
 st.markdown(f"#### θ = {theta_deg:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con il punto NIP")
