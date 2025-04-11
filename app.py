@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import streamlit as st
 
-# Funzione aggiornata secondo il disegno utente e logica reale
+# Funzione aggiornata secondo i 4 step reali del processo
 
 def draw_roll(D, L):
     fig, ax = plt.subplots(figsize=(7, 7))
     R = D / 2
-    theta = L / R  # angolo in radianti che rappresenta la rotazione da applicare prima del taglio
+    theta = L / R  # angolo in radianti della rotazione PRE-TAGLIO necessaria
     theta_deg = np.degrees(theta)
 
     # Sfondo e griglia
@@ -21,44 +21,43 @@ def draw_roll(D, L):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Punto fisso di contatto con il rullo (dove inizia il velo dopo il taglio)
-    angle_contatto_deg = 250
-    angle_contatto_rad = np.radians(angle_contatto_deg)
-    x_contatto = R * np.cos(angle_contatto_rad)
-    y_contatto = R * np.sin(angle_contatto_rad)
+    # Punto di nip fisso (250°)
+    angle_nip_deg = 250
+    angle_nip_rad = np.radians(angle_nip_deg)
+    x_nip = R * np.cos(angle_nip_rad)
+    y_nip = R * np.sin(angle_nip_rad)
 
-    # Punto colla iniziale (a 90°)
-    angle_colla_init_rad = np.pi / 2
-    x_colla_init = R * np.cos(angle_colla_init_rad)
-    y_colla_init = R * np.sin(angle_colla_init_rad)
+    # Punto colla iniziale (90°)
+    angle_colla_rad = np.pi / 2
+    x_colla_init = R * np.cos(angle_colla_rad)
+    y_colla_init = R * np.sin(angle_colla_rad)
 
-    # Punto colla dopo rotazione (ruotiamo INDIETRO di θ, senso antiorario)
-    angle_colla_rotated_rad = angle_colla_init_rad + theta
+    # Rotazione antioraria (step 2): ruoto la bobina per spostare la colla verso il nip
+    angle_colla_rotated_rad = angle_colla_rad + theta
     x_colla_rotated = R * np.cos(angle_colla_rotated_rad)
     y_colla_rotated = R * np.sin(angle_colla_rotated_rad)
 
-    # Disegno tratto di velo (parte marrone): da contatto verso sinistra
-    ax.plot([x_contatto - L, x_contatto], [y_contatto, y_contatto],
-            color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
+    # Segmento marrone = il tratto di velo che sarà tagliato
+    ax.plot([x_nip - L, x_nip], [y_nip, y_nip], color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
 
-    # Colla
+    # Colla: iniziale e posizione dopo rotazione
     ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (@90°)')
-    ax.plot([x_contatto], [y_contatto], 'o', color="#1e88e5", markersize=8, label='Posizione finale della colla (dopo rotazione)')
+    ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso)')
 
-    # Arco θ (antiorario, da 90° a 90° + θ)
+    # Arco θ antiorario = quanto devo ruotare prima del taglio
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
                       theta1=90,
                       theta2=90 + theta_deg,
-                      color='#ffa726', linewidth=2.5, label='Rotazione θ')
+                      color='#ffa726', linewidth=2.5, label='Rotazione pre-taglio θ')
     ax.add_patch(arc)
 
-    # Arco interno per θ
     arc_theta = patches.Arc((0, 0), 0.6*R, 0.6*R, angle=0,
                             theta1=90,
                             theta2=90 + theta_deg,
                             color='blue', linewidth=1.5, linestyle='--')
     ax.add_patch(arc_theta)
-    angle_label = (angle_colla_init_rad + angle_colla_rotated_rad) / 2
+
+    angle_label = angle_colla_rad + theta / 2
     x_theta = 0.4 * R * np.cos(angle_label)
     y_theta = 0.4 * R * np.sin(angle_label)
     ax.text(x_theta, y_theta, 'θ', fontsize=14, color='blue', ha='center', va='center')
@@ -82,10 +81,10 @@ def draw_roll(D, L):
     ax.set_xlim(-R - 200, R + 200)
     ax.set_ylim(rullo_offset_y - 60, R + 120)
     ax.set_aspect('equal')
-    ax.set_title(f"\u2728 Bobina Interattiva \u2728\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm | Rotazione θ = {theta_deg:.2f}°",
+    ax.set_title(f"\u2728 Bobina Interattiva \u2728\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
                  fontsize=13, fontweight='bold', color="#333")
 
-    return fig
+    return fig, theta_deg
 
 # Streamlit app
 st.set_page_config(page_title="Bobina Interattiva", layout="centered")
@@ -94,14 +93,7 @@ st.title("🌀 Bobina Interattiva")
 D = st.slider("Diametro della bobina (mm)", min_value=800, max_value=1200, value=1000, step=10)
 L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=1200, step=10)
 
-fig = draw_roll(D, L)
+fig, theta = draw_roll(D, L)
 st.pyplot(fig, use_container_width=True)
 
-# Legenda esterna
-st.markdown("<div style='display: flex; justify-content: center;'>",
-            unsafe_allow_html=True)
-st.pyplot(fig, use_container_width=True)
-st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown(f"#### θ = {(360 * L / (np.pi * D)):.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla")
-
+st.markdown(f"#### θ = {theta:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con la fine del velo")
