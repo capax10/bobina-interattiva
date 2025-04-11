@@ -22,8 +22,8 @@ def draw_roll(D, L, highlight_point=None):
     angle_colla_final_deg = np.degrees(angle_colla_final_rad) % 360
     x_colla_init = R * np.cos(angle_colla_init_rad)
     y_colla_init = R * np.sin(angle_colla_init_rad)
-    x_colla_final = R * np.cos(angle_colla_final_rad)
-    y_colla_final = R * np.sin(angle_colla_final_rad)
+    x_colla_final = R * np.cos(np.radians(90 + theta_deg))
+    y_colla_final = R * np.sin(np.radians(90 + theta_deg))
 
     theta_deg = (angle_nip_deg - angle_colla_final_deg) % 360
 
@@ -78,53 +78,15 @@ def draw_roll(D, L, highlight_point=None):
     ax.set_xlim(-R - 200, R + 200)
     ax.set_ylim(rullo_offset_y - 60, R + 120)
     ax.set_aspect('equal')
-    ax.set_title(f"✨ Bobina Interattiva ✨\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
+    ax.set_title(f"✨ Bobina Interattiva ✨
+Diametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
              fontsize=13, fontweight='bold', color="#333")
 
     ax.legend(loc='upper right', fontsize=8, frameon=True)
 
     return fig, theta_deg, angle_colla_init_rad, theta, R
 
-# Funzione per animare la rotazione della colla
 
-def animate_rotation(D, L):
-    steps = 20
-    R = D / 2
-    theta = L / R
-    angle_colla_init_rad = np.radians(90)
-    # Genera base statica con colla SEMPRE a 90°
-    fig_base, ax_base = plt.subplots(figsize=(7, 7))
-    angle_colla_init_rad = np.radians(90)
-    angle_nip_rad = np.radians(250)
-    x_colla_init = R * np.cos(angle_colla_init_rad)
-    y_colla_init = R * np.sin(angle_colla_init_rad)
-    x_nip = R * np.cos(angle_nip_rad)
-    y_nip = R * np.sin(angle_nip_rad)
-    ax_base.plot([x_nip - L, x_nip], [y_nip, y_nip], color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
-    ax_base.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (@90°)')
-    ax_base.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso @250°)')
-    ax_base.set_xlim(-R - 200, R + 200)
-    ax_base.set_ylim(-R - 200, R + 200)
-    ax_base.axis('off')  # disegno base senza colla animata
-    for i in range(steps + 1):
-        step_theta = theta * i / steps
-        angle_step = angle_colla_init_rad + step_theta
-        x_step = R * np.cos(angle_step)
-        y_step = R * np.sin(angle_step)
-        fig, ax = plt.subplots(figsize=(7, 7))
-        # Ricostruzione manuale della base (senza imshow per compatibilità)
-        ax.plot([x_nip - L, x_nip], [y_nip, y_nip], color="#795548", linewidth=3.0)
-        ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8)
-        ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8)
-        ax.plot([0, x_step], [0, y_step], color='red', linestyle='--', linewidth=2)
-        ax.plot(x_step, y_step, 'o', color='red', markersize=6)
-        ax.annotate('', xy=(x_step, y_step), xytext=(0, 0),
-                    arrowprops=dict(arrowstyle="->", color='red', lw=2, linestyle='-'))
-        ax.set_xlim(-R - 200, R + 200)
-        ax.set_ylim(-R - 200, R + 200)
-        ax.axis('off')
-        st.pyplot(fig, use_container_width=True)
-        time.sleep(0.05)
 
 # Streamlit app
 st.set_page_config(page_title="Bobina Interattiva", layout="centered")
@@ -133,12 +95,5 @@ st.title("🌀 Bobina Interattiva")
 D = st.slider("Diametro della bobina (mm)", min_value=800, max_value=1200, value=1000, step=10)
 L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=1200, step=10)
 
-animate = st.checkbox("Mostra animazione della rotazione")
-
-fig, theta_deg, *_ = draw_roll(D, L)
-st.pyplot(fig, use_container_width=True)
-
-if animate:
-    animate_rotation(D, L)
 
 st.markdown(f"#### θ = {theta_deg:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con il punto NIP")
