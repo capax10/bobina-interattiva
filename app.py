@@ -22,8 +22,8 @@ def draw_roll(D, L, highlight_point=None):
     angle_colla_final_deg = np.degrees(angle_colla_final_rad) % 360
     x_colla_init = R * np.cos(angle_colla_init_rad)
     y_colla_init = R * np.sin(angle_colla_init_rad)
-    x_colla_final = R * np.cos(angle_colla_final_rad)
-    y_colla_final = R * np.sin(angle_colla_final_rad)
+    x_colla_final = R * np.cos(np.radians(90 + theta_deg))
+    y_colla_final = R * np.sin(np.radians(90 + theta_deg))
 
     theta_deg = (angle_nip_deg - angle_colla_final_deg) % 360
 
