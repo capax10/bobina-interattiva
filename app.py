@@ -43,7 +43,7 @@ def draw_roll(D, L, highlight_point=None):
 
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
                       theta1=90,
-                      theta2=90 + np.degrees(theta),
+                      theta2=90 + theta_deg,
                       color='#ffa726', linewidth=2.5, label='Rotazione pre-taglio θ')
     ax.add_patch(arc)
 
