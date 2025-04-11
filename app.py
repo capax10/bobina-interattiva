@@ -26,7 +26,7 @@ def draw_roll(D, L):
     x_colla_final = R * np.cos(angle_colla_final_rad)
     y_colla_final = R * np.sin(angle_colla_final_rad)
 
-    theta_deg = (angle_colla_final_deg - angle_colla_init_deg) % 360
+    theta_deg = (angle_nip_deg - angle_colla_final_deg) % 360
 
     # Sfondo e griglia
     ax.set_facecolor("#f9f9f9")
