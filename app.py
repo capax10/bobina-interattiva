@@ -20,35 +20,35 @@ def draw_roll(D, L):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Punto di partenza a 250°
-    angle_start = 250 * np.pi / 180
-    x_start = R * np.cos(angle_start)
-    y_start = R * np.sin(angle_start)
+    # Punto colla a 90°
+    angle_colla = 90 * np.pi / 180
+    x_colla = R * np.cos(angle_colla)
+    y_colla = R * np.sin(angle_colla)
 
-    # Punto colla dopo rotazione
-    angle_colla_rotated = angle_start - theta
-    x_colla = R * np.cos(angle_colla_rotated)
-    y_colla = R * np.sin(angle_colla_rotated)
+    # Punto dopo rotazione
+    angle_rotated = angle_colla - theta
+    x_final = R * np.cos(angle_rotated)
+    y_final = R * np.sin(angle_rotated)
 
     # Disegno del velo
-    ax.plot([x_start, x_colla], [y_start, y_colla], color="#4caf50", linewidth=2.5, label='Velo L')
-    ax.plot([x_colla], [y_colla], 'o', color="#e53935", markersize=8, label='Colla')
+    ax.plot([x_final, x_colla], [y_final, y_colla], color="#4caf50", linewidth=2.5, label='Velo L')
+    ax.plot([x_colla], [y_colla], 'o', color="#e53935", markersize=8, label='Colla (inizio)')
+    ax.plot([x_final], [y_final], 'o', color="#1e88e5", markersize=8, label='Colla (dopo rotazione)')
 
     # Arco evidenziato
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
-                      theta1=np.degrees(angle_colla_rotated),
-                      theta2=np.degrees(angle_start),
+                      theta1=np.degrees(angle_rotated),
+                      theta2=90,
                       color='#ffa726', linewidth=2.5, label='Arco L')
     ax.add_patch(arc)
 
-    # Visualizzazione angolo θ con una linea curva (piccolo arco vicino al centro)
+    # Visualizzazione angolo θ (curva interna)
     arc_theta = patches.Arc((0, 0), 0.6*R, 0.6*R, angle=0,
-                            theta1=np.degrees(angle_colla_rotated),
-                            theta2=np.degrees(angle_start),
+                            theta1=np.degrees(angle_rotated),
+                            theta2=90,
                             color='blue', linewidth=1.5, linestyle='--')
     ax.add_patch(arc_theta)
-    # Etichetta per θ
-    angle_label = (angle_start + angle_colla_rotated) / 2
+    angle_label = (angle_colla + angle_rotated) / 2
     x_theta = 0.4 * R * np.cos(angle_label)
     y_theta = 0.4 * R * np.sin(angle_label)
     ax.text(x_theta, y_theta, 'θ', fontsize=14, color='blue', ha='center', va='center')
@@ -88,3 +88,4 @@ fig = draw_roll(D, L)
 st.pyplot(fig, use_container_width=True)
 
 st.markdown(f"#### θ = {np.degrees(L / (D/2)):.2f}° di rotazione necessaria")
+
