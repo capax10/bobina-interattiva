@@ -5,6 +5,8 @@ import streamlit as st
 
 # Funzione aggiornata per mantenere il punto di NIP fisso a 250° e ruotare la colla fino a quel punto
 
+import time
+
 def draw_roll(D, L):
     fig, ax = plt.subplots(figsize=(7, 7))
     R = D / 2
@@ -87,6 +89,19 @@ def draw_roll(D, L):
     ax.set_title(f"\u2728 Bobina Interattiva \u2728\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
                  fontsize=13, fontweight='bold', color="#333")
 
+        # Calcoli visibili per debug
+    st.markdown(f"""
+    ### 📐 Calcoli dettagliati
+    - Diametro \(D\) = {D} mm
+    - Raggio \(R = D/2\) = {R:.2f} mm
+    - Lunghezza velo \(L\) = {L} mm
+    - Angolo \(	heta = L / R\) = {theta:.4f} rad = {np.degrees(theta):.2f}°
+    - Posizione iniziale colla: 90°
+    - Posizione finale colla (dopo rotazione): {angle_colla_final_deg:.2f}°
+    - Punto di NIP: 250°
+    - Rotazione necessaria \(	heta\_deg = 250° - posizione finale colla\) = {theta_deg:.2f}°
+    """)
+
     return fig, theta_deg
 
 # Streamlit app
@@ -97,6 +112,19 @@ D = st.slider("Diametro della bobina (mm)", min_value=800, max_value=1200, value
 L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=1200, step=10)
 
 fig, theta = draw_roll(D, L)
-st.pyplot(fig, use_container_width=True)
+# Animazione: mostra movimento in step
+steps = 20
+for i in range(steps + 1):
+    step_theta = theta * i / steps
+    angle_step_deg = np.degrees(angle_colla_init_rad + step_theta) % 360
+    x_step = R * np.cos(angle_colla_init_rad + step_theta)
+    y_step = R * np.sin(angle_colla_init_rad + step_theta)
+
+    fig, ax = plt.subplots(figsize=(7, 7))
+    draw_roll(D, L)  # call to update base drawing
+    ax.plot([0, x_step], [0, y_step], color='red', linestyle='-', linewidth=2)
+    ax.plot([x_step], [y_step], 'o', color='red', markersize=6, label=f'Passo {i}/{steps} → {angle_step_deg:.1f}°')
+    st.pyplot(fig, use_container_width=True)
+    time.sleep(0.05)
 
 st.markdown(f"#### θ = {theta:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con il punto NIP")
