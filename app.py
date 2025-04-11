@@ -38,7 +38,7 @@ def draw_roll(D, L, highlight_point=None):
     ax.plot([x_nip - L, x_nip], [y_nip, y_nip], color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
 
     ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (@90°)')
-    ax.plot([x_colla_final], [y_colla_final], 'o', color="#43a047", markersize=8, label=f'Posizione dopo rotazione ({angle_colla_final_deg:.1f}°)')
+    ax.plot([x_colla_final], [y_colla_final], 'o', color="#43a047", markersize=8, label='Fine del velo (dopo rotazione)')')
     ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso @250°)')
 
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
@@ -78,8 +78,11 @@ def draw_roll(D, L, highlight_point=None):
     ax.set_xlim(-R - 200, R + 200)
     ax.set_ylim(rullo_offset_y - 60, R + 120)
     ax.set_aspect('equal')
-    ax.set_title(f"\u2728 Bobina Interattiva \u2728\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
+    ax.set_title(f"✨ Bobina Interattiva ✨
+Diametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
                  fontsize=13, fontweight='bold', color="#333")
+
+    ax.legend(loc='upper right', fontsize=8, frameon=True)
 
     return fig, theta_deg, angle_colla_init_rad, theta, R
 
