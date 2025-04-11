@@ -20,8 +20,8 @@ def draw_roll(D, L):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Punto di partenza a 210° (ore 7)
-    angle_start = 210 * np.pi / 180
+    # Punto di partenza a 250°
+    angle_start = 250 * np.pi / 180
     x_start = R * np.cos(angle_start)
     y_start = R * np.sin(angle_start)
 
@@ -41,8 +41,20 @@ def draw_roll(D, L):
                       color='#ffa726', linewidth=2.5, label='Arco L')
     ax.add_patch(arc)
 
+    # Visualizzazione angolo θ con una linea curva (piccolo arco vicino al centro)
+    arc_theta = patches.Arc((0, 0), 0.6*R, 0.6*R, angle=0,
+                            theta1=np.degrees(angle_colla_rotated),
+                            theta2=np.degrees(angle_start),
+                            color='blue', linewidth=1.5, linestyle='--')
+    ax.add_patch(arc_theta)
+    # Etichetta per θ
+    angle_label = (angle_start + angle_colla_rotated) / 2
+    x_theta = 0.4 * R * np.cos(angle_label)
+    y_theta = 0.4 * R * np.sin(angle_label)
+    ax.text(x_theta, y_theta, 'θ', fontsize=14, color='blue', ha='center', va='center')
+
     # Etichette angoli
-    for deg in [0, 90, 180, 210, 270, 360]:
+    for deg in [0, 90, 180, 210, 250, 270, 360]:
         angle_rad = np.radians(deg)
         x = (R + 20) * np.cos(angle_rad)
         y = (R + 20) * np.sin(angle_rad)
@@ -70,7 +82,7 @@ st.set_page_config(page_title="Bobina Interattiva", layout="centered")
 st.title("🌀 Bobina Interattiva")
 
 D = st.slider("Diametro della bobina (mm)", min_value=800, max_value=1200, value=1000, step=10)
-L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=600, value=300, step=10)
+L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=300, step=10)
 
 fig = draw_roll(D, L)
 st.pyplot(fig, use_container_width=True)
