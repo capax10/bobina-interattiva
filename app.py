@@ -90,7 +90,20 @@ def animate_rotation(D, L):
     R = D / 2
     theta = L / R
     angle_colla_init_rad = np.radians(90)
-    fig_base, *_ = draw_roll(D, L, highlight_point=None)  # disegno base senza colla animata
+    # Genera base statica con colla SEMPRE a 90°
+    fig_base, ax_base = plt.subplots(figsize=(7, 7))
+    angle_colla_init_rad = np.radians(90)
+    angle_nip_rad = np.radians(250)
+    x_colla_init = R * np.cos(angle_colla_init_rad)
+    y_colla_init = R * np.sin(angle_colla_init_rad)
+    x_nip = R * np.cos(angle_nip_rad)
+    y_nip = R * np.sin(angle_nip_rad)
+    ax_base.plot([x_nip - L, x_nip], [y_nip, y_nip], color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
+    ax_base.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (@90°)')
+    ax_base.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso @250°)')
+    ax_base.set_xlim(-R - 200, R + 200)
+    ax_base.set_ylim(-R - 200, R + 200)
+    ax_base.axis('off')  # disegno base senza colla animata
     for i in range(steps + 1):
         step_theta = theta * i / steps
         angle_step = angle_colla_init_rad + step_theta
@@ -100,6 +113,8 @@ def animate_rotation(D, L):
         ax.imshow(fig_base.canvas.buffer_rgba(), extent=ax.get_window_extent().bounds, aspect='auto')
         ax.plot([0, x_step], [0, y_step], color='red', linestyle='--', linewidth=2)
         ax.plot(x_step, y_step, 'o', color='red', markersize=6)
+        ax.annotate('', xy=(x_step, y_step), xytext=(0, 0),
+                    arrowprops=dict(arrowstyle="->", color='red', lw=2, linestyle='-'))
         ax.set_xlim(-R - 200, R + 200)
         ax.set_ylim(-R - 200, R + 200)
         ax.axis('off')
@@ -122,3 +137,4 @@ if animate:
     animate_rotation(D, L)
 
 st.markdown(f"#### θ = {theta_deg:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con il punto NIP")
+
