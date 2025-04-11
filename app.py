@@ -32,13 +32,10 @@ def draw_roll(D, L):
     x_colla_init = R * np.cos(angle_colla_init_rad)
     y_colla_init = R * np.sin(angle_colla_init_rad)
 
-    # Punto colla dopo rotazione (ruotiamo avanti di θ)
-    angle_colla_rotated_rad = angle_colla_init_rad - theta
+    # Punto colla dopo rotazione (ruotiamo INDIETRO di θ, senso antiorario)
+    angle_colla_rotated_rad = angle_colla_init_rad + theta
     x_colla_rotated = R * np.cos(angle_colla_rotated_rad)
     y_colla_rotated = R * np.sin(angle_colla_rotated_rad)
-
-    # Punto colla dopo rotazione deve coincidere con punto fisso (contatto)
-    # quindi ruotiamo θ per far combaciare
 
     # Disegno tratto di velo (parte marrone): da contatto verso sinistra
     ax.plot([x_contatto - L, x_contatto], [y_contatto, y_contatto],
@@ -48,17 +45,17 @@ def draw_roll(D, L):
     ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (@90°)')
     ax.plot([x_contatto], [y_contatto], 'o', color="#1e88e5", markersize=8, label='Posizione finale della colla (dopo rotazione)')
 
-    # Arco θ (da colla iniziale a punto contatto)
+    # Arco θ (antiorario, da 90° a 90° + θ)
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
                       theta1=90,
-                      theta2=90 - theta_deg,
+                      theta2=90 + theta_deg,
                       color='#ffa726', linewidth=2.5, label='Rotazione θ')
     ax.add_patch(arc)
 
     # Arco interno per θ
     arc_theta = patches.Arc((0, 0), 0.6*R, 0.6*R, angle=0,
                             theta1=90,
-                            theta2=90 - theta_deg,
+                            theta2=90 + theta_deg,
                             color='blue', linewidth=1.5, linestyle='--')
     ax.add_patch(arc_theta)
     angle_label = (angle_colla_init_rad + angle_colla_rotated_rad) / 2
@@ -87,7 +84,6 @@ def draw_roll(D, L):
     ax.set_aspect('equal')
     ax.set_title(f"\u2728 Bobina Interattiva \u2728\nDiametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm | Rotazione θ = {theta_deg:.2f}°",
                  fontsize=13, fontweight='bold', color="#333")
-    ax.legend(loc='upper right', frameon=True, framealpha=0.9)
 
     return fig
 
@@ -101,4 +97,11 @@ L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=120
 fig = draw_roll(D, L)
 st.pyplot(fig, use_container_width=True)
 
+# Legenda esterna
+st.markdown("<div style='display: flex; justify-content: center;'>",
+            unsafe_allow_html=True)
+st.pyplot(fig, use_container_width=True)
+st.markdown("</div>", unsafe_allow_html=True)
+
 st.markdown(f"#### θ = {(360 * L / (np.pi * D)):.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla")
+
