@@ -1,8 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from io import BytesIO
-import base64
 import streamlit as st
 
 # Funzione per disegnare il rotolo
@@ -16,37 +13,34 @@ def draw_roll(D, L):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Punto colla (a ore 12)
-    ax.plot([0], [R], 'ro', label='Colla')
+    # Angolo di rotazione theta (in radianti)
+    theta = 2 * L / D
 
-    # Angolo di rotazione theta
-    theta = 2 * L / D  # in radianti
-    x_end = R * np.sin(-theta)
-    y_end = R * np.cos(-theta)
+    # Punto colla ruotato in avanti di theta (verso arrotolamento)
+    x_colla = R * np.sin(-theta)
+    y_colla = R * np.cos(-theta)
+    ax.plot([x_colla], [y_colla], 'ro', label='Colla')
 
-    # Velo non ancora arrotolato
-    ax.plot([0, x_end], [R, y_end], 'g-', linewidth=2, label='Estremità velo')
+    # Punto iniziale del velo (dalla parte opposta rispetto al punto colla)
+    x_velo_start = R * np.sin(0)
+    y_velo_start = R * np.cos(0)
+    ax.plot([x_velo_start, x_colla], [y_velo_start, y_colla], 'g-', linewidth=2, label='Velo L')
 
     ax.set_xlim(-R - 100, R + 100)
     ax.set_ylim(-R - 100, R + 100)
     ax.set_aspect('equal')
-    ax.set_title(f"D = {D:.0f} mm, L = {L:.0f} mm\nθ = {np.degrees(theta):.2f} gradi")
+    ax.set_title(f"Bobina Interattiva\nD = {D:.0f} mm, L = {L:.0f} mm, θ = {np.degrees(theta):.2f}°")
     ax.legend()
 
-    buf = BytesIO()
-    fig.savefig(buf, format="png")
-    buf.seek(0)
-    img_base64 = base64.b64encode(buf.read()).decode("utf-8")
-    plt.close(fig)
-    return img_base64
+    return fig
 
 # Streamlit app
-st.title("Simulatore di rotazione rotolo carta igienica")
+st.title("Bobina Interattiva")
 
 D = st.slider("Diametro D (mm)", min_value=800, max_value=1200, value=1000)
 L = st.slider("Lunghezza L (mm)", min_value=50, max_value=600, value=300)
 
-img_data = draw_roll(D, L)
-st.image(f"data:image/png;base64,{img_data}", use_column_width=True)
+fig = draw_roll(D, L)
+st.pyplot(fig)
 
-st.markdown(f"### Angolo di rotazione: {np.degrees(2 * L / D):.2f} gradi")
+st.markdown(f"### Angolo di rotazione: {np.degrees(2 * L / D):.2f}°")
