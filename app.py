@@ -17,12 +17,16 @@ def draw_roll(D, L):
     y_nip = R * np.sin(angle_nip_rad)
 
     # Punto colla iniziale = deve arrivare a 250° ruotando di θ → parte da 250° - θ
-    angle_colla_init_rad = angle_nip_rad - theta
-    angle_colla_init_deg = np.degrees(angle_colla_init_rad) % 360
+    angle_colla_init_deg = 90
+    angle_colla_init_rad = np.radians(angle_colla_init_deg)
+    angle_colla_final_rad = angle_colla_init_rad + theta
+    angle_colla_final_deg = np.degrees(angle_colla_final_rad) % 360
     x_colla_init = R * np.cos(angle_colla_init_rad)
     y_colla_init = R * np.sin(angle_colla_init_rad)
+    x_colla_final = R * np.cos(angle_colla_final_rad)
+    y_colla_final = R * np.sin(angle_colla_final_rad)
 
-    theta_deg = (angle_nip_deg - angle_colla_init_deg) % 360
+    theta_deg = (angle_colla_final_deg - angle_colla_init_deg) % 360
 
     # Sfondo e griglia
     ax.set_facecolor("#f9f9f9")
@@ -39,13 +43,14 @@ def draw_roll(D, L):
             color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
 
     # Punti colla e nip
-    ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label=f'Colla applicata ({angle_colla_init_deg:.1f}°)')
+    ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (@90°)')
+    ax.plot([x_colla_final], [y_colla_final], 'o', color="#43a047", markersize=8, label=f'Posizione dopo rotazione ({angle_colla_final_deg:.1f}°)')
     ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso @250°)')
 
     # Arco θ antiorario da colla a nip
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
                       theta1=angle_colla_init_deg,
-                      theta2=angle_nip_deg,
+                      theta2=angle_colla_final_deg,
                       color='#ffa726', linewidth=2.5, label='Rotazione pre-taglio θ')
     ax.add_patch(arc)
 
