@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import streamlit as st
 
-# Funzione per disegnare il rotolo con stile migliorato
+# Funzione per disegnare il rotolo con stile migliorato e gradi
 
 def draw_roll(D, L):
     fig, ax = plt.subplots(figsize=(7, 7))
@@ -20,8 +20,8 @@ def draw_roll(D, L):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Punto di partenza a ore 7 (210°)
-    angle_start = 7 * np.pi / 6
+    # Punto di partenza a 210° (ore 7)
+    angle_start = 210 * np.pi / 180
     x_start = R * np.cos(angle_start)
     y_start = R * np.sin(angle_start)
 
@@ -41,14 +41,12 @@ def draw_roll(D, L):
                       color='#ffa726', linewidth=2.5, label='Arco L')
     ax.add_patch(arc)
 
-    # Etichette ore
-    x_ore12 = R * np.cos(np.pi / 2)
-    y_ore12 = R * np.sin(np.pi / 2)
-    ax.text(x_ore12, y_ore12 + 25, "Ore 12", ha='center', va='bottom', fontsize=10, color='black')
-
-    x_ore7 = R * np.cos(angle_start)
-    y_ore7 = R * np.sin(angle_start)
-    ax.text(x_ore7 - 25, y_ore7 - 15, "Ore 7", ha='right', va='top', fontsize=10, color='black')
+    # Etichette angoli
+    for deg in [0, 90, 180, 210, 270, 360]:
+        angle_rad = np.radians(deg)
+        x = (R + 20) * np.cos(angle_rad)
+        y = (R + 20) * np.sin(angle_rad)
+        ax.text(x, y, f"{deg}°", ha='center', va='center', fontsize=9, color='black')
 
     # Rulli
     rullo_raggio = 20
