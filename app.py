@@ -3,23 +3,26 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import streamlit as st
 
-# Funzione aggiornata per calcolare correttamente la posizione iniziale della colla
+# Funzione aggiornata per mantenere il punto di NIP fisso a 250° e ruotare la colla fino a quel punto
 
 def draw_roll(D, L):
     fig, ax = plt.subplots(figsize=(7, 7))
     R = D / 2
     theta = L / R  # angolo in radianti della rotazione PRE-TAGLIO necessaria
 
-    # Punto colla iniziale sempre a 90°
-    angle_colla_init_deg = 90
-    angle_colla_init_rad = np.radians(angle_colla_init_deg)
+    # Punto fisso del NIP a 250°
+    angle_nip_deg = 250
+    angle_nip_rad = np.radians(angle_nip_deg)
+    x_nip = R * np.cos(angle_nip_rad)
+    y_nip = R * np.sin(angle_nip_rad)
 
-    # Punto finale = dove la colla deve arrivare: 90° + θ
-    angle_colla_final_rad = angle_colla_init_rad + theta
-    angle_colla_final_deg = np.degrees(angle_colla_final_rad) % 360
+    # Punto colla iniziale = deve arrivare a 250° ruotando di θ → parte da 250° - θ
+    angle_colla_init_rad = angle_nip_rad - theta
+    angle_colla_init_deg = np.degrees(angle_colla_init_rad) % 360
+    x_colla_init = R * np.cos(angle_colla_init_rad)
+    y_colla_init = R * np.sin(angle_colla_init_rad)
 
-    # Aggiorna θ per rappresentare il movimento da 90° a (90° + θ)
-    theta_deg = angle_colla_final_deg - angle_colla_init_deg
+    theta_deg = np.degrees(theta)
 
     # Sfondo e griglia
     ax.set_facecolor("#f9f9f9")
@@ -31,31 +34,24 @@ def draw_roll(D, L):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Coordinate punti
-    x_colla_init = R * np.cos(angle_colla_init_rad)
-    y_colla_init = R * np.sin(angle_colla_init_rad)
-
-    x_colla_final = R * np.cos(angle_colla_final_rad)
-    y_colla_final = R * np.sin(angle_colla_final_rad)
-
-    # Segmento marrone = il tratto di velo che sarà tagliato
-    ax.plot([x_colla_final - L, x_colla_final], [y_colla_final, y_colla_final],
+    # Segmento marrone = tratto di velo che sarà tagliato
+    ax.plot([x_nip - L, x_nip], [y_nip, y_nip],
             color="#795548", linewidth=3.0, label='Velo da tagliare (L)')
 
-    # Colla: posizione iniziale e dove arriverà prima del taglio
-    ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label='Colla applicata (inizio @90°)')
-    ax.plot([x_colla_final], [y_colla_final], 'o', color="#1e88e5", markersize=8, label='Colla dopo rotazione')
+    # Punti colla e nip
+    ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8, label=f'Colla applicata ({angle_colla_init_deg:.1f}°)')
+    ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso @250°)')
 
-    # Arco θ (da 90° a 90° + θ)
+    # Arco θ antiorario da colla a nip
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
                       theta1=angle_colla_init_deg,
-                      theta2=angle_colla_final_deg,
+                      theta2=angle_nip_deg,
                       color='#ffa726', linewidth=2.5, label='Rotazione pre-taglio θ')
     ax.add_patch(arc)
 
     arc_theta = patches.Arc((0, 0), 0.6*R, 0.6*R, angle=0,
                             theta1=angle_colla_init_deg,
-                            theta2=angle_colla_final_deg,
+                            theta2=angle_nip_deg,
                             color='blue', linewidth=1.5, linestyle='--')
     ax.add_patch(arc_theta)
 
@@ -98,4 +94,4 @@ L = st.slider("Lunghezza del velo (mm)", min_value=50, max_value=2000, value=120
 fig, theta = draw_roll(D, L)
 st.pyplot(fig, use_container_width=True)
 
-st.markdown(f"#### θ = {theta:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con la fine del velo")
+st.markdown(f"#### θ = {theta:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con il punto NIP")
