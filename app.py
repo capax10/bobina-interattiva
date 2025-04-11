@@ -16,14 +16,21 @@ def draw_roll(D, L, theta_anim=None):
     ax.add_patch(roll)
     ax.add_patch(core)
 
-    # Punto iniziale del velo (a ore 9 = punto di contatto col rullo sinistro)
-    x_start = -R
-    y_start = 0
+    # Punto iniziale del velo (a ore 7 = circa 210°)
+    angle_start = 7 * np.pi / 6  # 210° in radianti
+    x_start = R * np.cos(angle_start)
+    y_start = R * np.sin(angle_start)
 
-    # Punto colla ruotato in avanti (senso orario) di theta
-    angle_colla = np.pi - theta
-    x_colla = R * np.cos(angle_colla)
-    y_colla = R * np.sin(angle_colla)
+    # Punto colla a ore 12 (90° = pi/2)
+    angle_colla = np.pi / 2
+    x_colla_base = R * np.cos(angle_colla)
+    y_colla_base = R * np.sin(angle_colla)
+
+    # Calcolo dell'angolo di rotazione necessario per portare il punto colla a distanza L da ore 7
+    theta_required = L / R
+    angle_colla_rotated = angle_start - theta if theta_anim is not None else angle_start - theta_required
+    x_colla = R * np.cos(angle_colla_rotated)
+    y_colla = R * np.sin(angle_colla_rotated)
 
     # Disegno del velo e colla
     ax.plot([x_start, x_colla], [y_start, y_colla], 'g-', linewidth=2, label='Velo L')
