@@ -79,8 +79,7 @@ def draw_roll(D, L, highlight_point=None):
     ax.set_ylim(rullo_offset_y - 60, R + 120)
     ax.set_aspect('equal')
     ax.set_title(f"✨ Bobina Interattiva ✨
-Diametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm",
-             fontsize=13, fontweight='bold', color="#333")
+Diametro = {D:.0f} mm | Lunghezza Velo = {L:.0f} mm", fontsize=13, fontweight='bold', color="#333")
 
     ax.legend(loc='upper right', fontsize=8, frameon=True)
 
