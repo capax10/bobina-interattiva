@@ -1,14 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import streamlit as st
-import time
 
-# Funzione per disegnare il rotolo con angolo custom
+# Funzione per disegnare il rotolo con etichette e arco evidenziato
 
-def draw_roll(D, L, theta_anim=None):
+def draw_roll(D, L):
     fig, ax = plt.subplots(figsize=(6, 6))
     R = D / 2
-    theta = L / R if theta_anim is None else theta_anim
+    theta = L / R
 
     # Disegno del rotolo
     roll = plt.Circle((0, 0), R, fill=False, linewidth=2)
@@ -17,24 +17,35 @@ def draw_roll(D, L, theta_anim=None):
     ax.add_patch(core)
 
     # Punto iniziale del velo (a ore 7 = circa 210°)
-    angle_start = 7 * np.pi / 6  # 210° in radianti
+    angle_start = 7 * np.pi / 6
     x_start = R * np.cos(angle_start)
     y_start = R * np.sin(angle_start)
 
-    # Punto colla a ore 12 (90° = pi/2)
-    angle_colla = np.pi / 2
-    x_colla_base = R * np.cos(angle_colla)
-    y_colla_base = R * np.sin(angle_colla)
-
-    # Calcolo dell'angolo di rotazione necessario per portare il punto colla a distanza L da ore 7
+    # Punto colla dopo rotazione dal punto ore 7
     theta_required = L / R
-    angle_colla_rotated = angle_start - theta if theta_anim is not None else angle_start - theta_required
+    angle_colla_rotated = angle_start - theta_required
     x_colla = R * np.cos(angle_colla_rotated)
     y_colla = R * np.sin(angle_colla_rotated)
 
     # Disegno del velo e colla
     ax.plot([x_start, x_colla], [y_start, y_colla], 'g-', linewidth=2, label='Velo L')
     ax.plot([x_colla], [y_colla], 'ro', label='Colla')
+
+    # Evidenziazione dell'arco di lunghezza L
+    arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
+                      theta1=np.degrees(angle_colla_rotated),
+                      theta2=np.degrees(angle_start),
+                      color='orange', linewidth=2, label='Arco L')
+    ax.add_patch(arc)
+
+    # Etichette per ore 12 e ore 7
+    x_ore12 = R * np.cos(np.pi / 2)
+    y_ore12 = R * np.sin(np.pi / 2)
+    ax.text(x_ore12, y_ore12 + 20, "Ore 12", ha='center', va='bottom', fontsize=9, color='black')
+
+    x_ore7 = R * np.cos(angle_start)
+    y_ore7 = R * np.sin(angle_start)
+    ax.text(x_ore7 - 20, y_ore7 - 10, "Ore 7", ha='right', va='top', fontsize=9, color='black')
 
     # Aggiunta dei rulli sotto la bobina
     rullo_raggio = 20
@@ -59,18 +70,8 @@ st.title("Bobina Interattiva")
 
 D = st.slider("Diametro D (mm)", min_value=800, max_value=1200, value=1000)
 L = st.slider("Lunghezza L (mm)", min_value=50, max_value=600, value=300)
-animate = st.button("▶️ Anima Rotazione")
 
-if animate:
-    theta_target = L / (D / 2)
-    steps = 30
-    for i in range(steps + 1):
-        theta_step = theta_target * i / steps
-        fig = draw_roll(D, L, theta_step)
-        st.pyplot(fig, use_container_width=True)
-        time.sleep(0.05)
-else:
-    fig = draw_roll(D, L)
-    st.pyplot(fig, use_container_width=True)
+fig = draw_roll(D, L)
+st.pyplot(fig, use_container_width=True)
 
 st.markdown(f"### Angolo di rotazione: {np.degrees(L / (D/2)):.2f}°")
