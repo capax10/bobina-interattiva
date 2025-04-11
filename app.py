@@ -42,21 +42,21 @@ def draw_roll(D, L, highlight_point=None):
     ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8, label='Punto di NIP (fisso @250°)')
 
     arc = patches.Arc((0, 0), 2*R, 2*R, angle=0,
-                      theta1=angle_colla_init_deg,
-                      theta2=angle_colla_final_deg,
+                      theta1=90,
+                      theta2=250,
                       color='#ffa726', linewidth=2.5, label='Rotazione pre-taglio θ')
     ax.add_patch(arc)
 
     arc_theta = patches.Arc((0, 0), 0.6*R, 0.6*R, angle=0,
-                            theta1=angle_colla_init_deg,
-                            theta2=angle_nip_deg,
+                            theta1=90,
+                            theta2=250,
                             color='blue', linewidth=1.5, linestyle='--')
     ax.add_patch(arc_theta)
 
     angle_label = angle_colla_init_rad + theta / 2
     x_theta = 0.4 * R * np.cos(angle_label)
     y_theta = 0.4 * R * np.sin(angle_label)
-    ax.text(x_theta, y_theta, 'θ', fontsize=14, color='blue', ha='center', va='center')
+    ax.text(x_theta, y_theta, f'θ = {theta_deg:.1f}°', fontsize=14, color='blue', ha='center', va='center')
 
     for deg in [0, 90, 180, 210, 250, 270, 360]:
         angle_rad = np.radians(deg)
@@ -110,7 +110,10 @@ def animate_rotation(D, L):
         x_step = R * np.cos(angle_step)
         y_step = R * np.sin(angle_step)
         fig, ax = plt.subplots(figsize=(7, 7))
-        ax.imshow(fig_base.canvas.buffer_rgba(), extent=ax.get_window_extent().bounds, aspect='auto')
+        # Ricostruzione manuale della base (senza imshow per compatibilità)
+        ax.plot([x_nip - L, x_nip], [y_nip, y_nip], color="#795548", linewidth=3.0)
+        ax.plot([x_colla_init], [y_colla_init], 'o', color="#e53935", markersize=8)
+        ax.plot([x_nip], [y_nip], 'o', color="#1e88e5", markersize=8)
         ax.plot([0, x_step], [0, y_step], color='red', linestyle='--', linewidth=2)
         ax.plot(x_step, y_step, 'o', color='red', markersize=6)
         ax.annotate('', xy=(x_step, y_step), xytext=(0, 0),
@@ -137,4 +140,3 @@ if animate:
     animate_rotation(D, L)
 
 st.markdown(f"#### θ = {theta_deg:.2f}° → Rotazione da applicare PRIMA del taglio per far combaciare la colla con il punto NIP")
-
