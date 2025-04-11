@@ -87,7 +87,9 @@ def draw_roll(D, L, highlight_point=None):
 
 def animate_rotation(D, L):
     steps = 20
-    _, _, angle_colla_init_rad, theta, R = draw_roll(D, L)
+    R = D / 2
+    theta = L / R
+    angle_colla_init_rad = np.radians(90)
     for i in range(steps + 1):
         step_theta = theta * i / steps
         angle_step = angle_colla_init_rad + step_theta
